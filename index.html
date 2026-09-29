@@ -74,9 +74,10 @@ summary{cursor:pointer;color:var(--acc)}
       <input type="file" id="fi" accept=".json,application/json" hidden>
     </div>
   </div>
-  <div class="tabs"><button id="t1" class="on">Danh mục</button><button id="t2">Đáng chú ý <span id="n2"></span></button></div>
+  <div class="tabs"><button id="t1" class="on">Danh mục</button><button id="t2">Đáng chú ý <span id="n2"></span></button><button id="t3">Phân tích</button></div>
   <div class="grid" id="grid"></div>
   <div id="watch"></div>
+  <div id="ana" style="display:none"></div>
 </div>
 <script>
 var KEY='tg_coin_board_v2',msgs=[];
@@ -130,11 +131,36 @@ function seedAll(){
     if(!msgs.some(function(m){return m.id===id})){msgs.push({id:id,pid:s[0],tm:s[1],coin:s[2],text:s[3],ts:s[0],f:fields(s[3])});n++}});
   return n;
 }
+var CMC={},CMCT='',SNAP={BTC:[83948.24,1.68e12,1.02,1.63,1],ETH:[2711.30,331.05e9,2.35,0.63,2],BNB:[767.61,102.2e9,0.60,2.41,4],XRP:[1.50,94.61e9,1.78,1.13,5],SOL:[119.40,70.19e9,0.71,2.34,7],TRX:[0.3350,31.82e9,0.40,3.80,8],HYPE:[88.29,22.17e9,0.89,6.50,10],DOGE:[0.09487,16.3e9,2.14,4.80,11],LINK:[15.12,11.31e9,9.89,17.21,12],ADA:[0.2502,9.18e9,2.20,2.00,14]};
+'NEAR 4.75,UNI 8.83,LTC 68.75,AVAX 11.17,TAO 310.97,AAVE 157.34,ENA 0.25,ONDO 0.52,ARB 0.20,PYTH 0.08,ETHFI 0.72,CAKE 2.58,PENDLE 2.37,TIA 0.44,INJ 7.53,APT 0.83,JUP 0.33,RENDER 1.93,RAY 1.88,ZRO 1.59,MORPHO 2.49,CRV 0.40,SUI 1.14,DOT 1.18,ICP 3.33,ATOM 1.75,FIL 1.05,ETC 9.17,SEI 0.07,FET 0.23,WLD 0.50,MNT 0.66,KAS 0.05,POL 0.12,ALGO 0.13'.split(',').forEach(function(x){var a=x.split(' ');SNAP[a[0]]=[+a[1],null,null,null,null]});
+function getC(s){var d=CMC[s];if(d)return{p:d.p,mc:d.mc,c24:d.c24,c7:d.c7,r:d.r,live:1};var a=SNAP[s];return a?{p:a[0],mc:a[1],c24:a[2],c7:a[3],r:a[4],live:0}:null}
+function fp(p){return p>=100?p.toLocaleString('en-US',{maximumFractionDigits:0}):p>=1?p.toFixed(2):p>=0.01?p.toFixed(3):p.toPrecision(2)}
+function ab(n){return n>=1e12?(n/1e12).toFixed(2)+'T':n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(1)+'M':''+n}
+function sg(x){return x==null?'':(x>=0?'+':'')+x.toFixed(1)+'%'}
+function cmcTxt(s){var c=getC(s);if(!c)return '';return '$'+fp(c.p)+(c.mc?' · MC '+ab(c.mc):'')+(c.c24!=null?' · 24h '+sg(c.c24):'')+(c.c7!=null?' · 7d '+sg(c.c7):'')+(c.r?' · #'+c.r:'')+(c.live?'':' *')}
+var ANA=[
+{c:'ETHFI',s:[4,5,4],t:'Mcap khoảng 680–700 triệu $, TVL 4,9 tỷ $, phí 30 ngày 13,75 triệu $, doanh thu năm khoảng 45,8 triệu $ (khoảng 15 lần MC/revenue). Đã unlock 97% nguồn cung, đang thiết lập buyback từ doanh thu.',r:'Giá vẫn thấp hơn ATH khoảng 92%, cần doanh thu tiếp tục tăng; buyback phụ thuộc quản trị.',src:'Đỗ Bảo Crypto #72, #94'},
+{c:'AAVE',s:[5,4,3],t:'TVL khoảng 20,65 tỷ $, tăng khoảng 52% từ đầu tháng 7. Doanh thu gộp Q1 khoảng 197,6 triệu $, Q2 khoảng 155,6 triệu $. Aave V4 đã mainnet, chiếm trên 50% thị trường cho vay phi tập trung.',r:'Từng có đề xuất tạm dừng buyback trong 2026; GHO giao dịch hơi dưới peg; doanh thu Q3 mới có dữ liệu một phần (khoảng 90,5 triệu $).',src:'Đỗ Bảo Crypto #95; TCCL #34125 (không có chữ ký)'},
+{c:'UNI',s:[4,4,3],t:'Phí 30 ngày khoảng 194,8 triệu $ (riêng Robinhood Chain khoảng 136,6 triệu $), volume khoảng 81,3 tỷ $/30 ngày, v4 vượt v3 về volume tháng. Cơ chế Firepit cho phép burn UNI để đổi lấy phí tích lũy.',r:'Phần phí lớn đến từ một chain (Robinhood Chain); phí giao thức chưa chắc chuyển hết thành giá trị cho người giữ UNI.',src:'Đỗ Bảo Crypto #61, #77, #82'},
+{c:'TAO',s:[3,4,3],t:'128 subnet, mỗi subnet có Alpha token riêng; Kraken tích hợp dTAO. Halving 12/2025 giảm phát hành từ khoảng 7.200 xuống 3.600 TAO/ngày, tổng cung tối đa 21 triệu.',r:'Các bài đã đọc chưa có số liệu doanh thu thực; giá phụ thuộc mạnh vào câu chuyện AI.',src:'Đỗ Bảo Crypto #83, #90'},
+{c:'ENA',s:[4,2,3],t:'TVL khoảng 4,73 tỷ $, phí 30 ngày khoảng 17,7 triệu $, tổng phí tích lũy vượt 1,04 tỷ $. Foundation mua lại token seed chưa vest và chấm dứt unlock hàng tháng.',r:'Phần token investor còn lại release một lần từ 5/10 (còn khoảng 12% supply locked): mốc tăng cung cần theo dõi.',src:'Đỗ Bảo Crypto #66, #76, #79'},
+{c:'ARB',s:[3,3,3],t:'H1/2026: 478 triệu giao dịch, DAO thu khoảng 6,19 triệu $. Robinhood Chain trả 10% net protocol revenue; riêng tháng 7 khoảng 360.000 $, chiếm 35% thu nhập DAO tháng đó.',r:'Doanh thu DAO còn nhỏ. Chưa có dữ liệu về lịch mở khóa: kiểm tra mục Token unlocks trên CMC.',src:'Đỗ Bảo Crypto #55, #78'},
+{c:'PYTH',s:[3,3,3],t:'Tháng 8/2026 tốt nhất từ trước tới nay: ARR vượt 10,4 triệu $, gross new ARR khoảng 2,9 triệu $ (tháng 7 khoảng 1,7 triệu $), DAO nhận 433.740 USDC.',r:'Doanh thu còn nhỏ; thiếu số liệu vốn hóa và lịch mở khóa nên nguồn cung và định giá chấm trung tính.',src:'Đỗ Bảo Crypto #60, #85, #89'}];
+var NOSC=[['BTC','Đỗ Bảo nêu lệnh mua 2% vốn giá 64.623$, tổng vốn đã vào 48% (#56, #88).'],['SOL','Được đưa vào danh mục đáng mua (#86); chưa có số liệu cơ bản trong các bài đã đọc.'],['LINK','Đỗ Bảo nêu mục tiêu 40$ (#58, #92); chưa có số liệu cơ bản trong các bài đã đọc.'],['ONDO','Đỗ Bảo nêu điểm mua đầu tiên, mua 1/3 vốn (#51); chưa có số liệu cơ bản trong các bài đã đọc.']];
+function renderAna(){
+  var a=ANA.map(function(x){x.tot=x.s[0]+x.s[1]+x.s[2];return x}).sort(function(x,y){return y.tot-x.tot});
+  var src=CMCT?'CoinMarketCap API, cập nhật '+new Date(CMCT).toLocaleString('vi-VN'):'CoinMarketCap, ảnh chụp ngày 29/09/2026; dấu * là số làm tròn hoặc chưa cập nhật tự động';
+  var h='<p class="sub">Đánh giá của Claude dựa trên các bài đã đọc (kênh Đỗ Bảo Crypto) và số liệu '+src+'. Chấm 0–5 cho ba tiêu chí: nhu cầu và doanh thu thật, áp lực nguồn cung, định giá; điểm 3 là trung tính hoặc thiếu dữ liệu. Đây không phải khuyến nghị đầu tư và không dự đoán giá: các con số do kênh nêu, chưa được kiểm chứng độc lập, và giá crypto có thể giảm mạnh.</p><div class="grid">';
+  h+=a.map(function(x){var c=cmcTxt(x.c);return'<div class="card"><div class="top"><span class="tk">'+x.c+'</span><span class="badge LONG">'+x.tot+'/15</span></div><dl class="f">'+(c?'<dt>CMC</dt><dd>'+esc(c)+'</dd>':'')+'<dt>Nhu cầu</dt><dd>'+x.s[0]+'/5</dd><dt>Nguồn cung</dt><dd>'+x.s[1]+'/5</dd><dt>Định giá</dt><dd>'+x.s[2]+'/5</dd></dl><div class="msg" style="margin-top:10px">'+esc(x.t)+'</div><div class="msg">Rủi ro: '+esc(x.r)+'</div><div class="meta">Nguồn: '+esc(x.src)+'</div></div>'}).join('')+'</div>';
+  h+='<h2>Chưa đủ dữ liệu để chấm</h2><div class="grid">'+NOSC.map(function(x){var c=cmcTxt(x[0]);return'<div class="card"><div class="top"><span class="tk">'+x[0]+'</span></div>'+(c?'<dl class="f"><dt>CMC</dt><dd>'+esc(c)+'</dd></dl>':'')+'<div class="msg" style="margin-top:10px">'+esc(x[1])+'</div></div>'}).join('')+'</div>';
+  $('ana').innerHTML=h;
+}
 var TAB=1;
 function loadRemote(){
   return fetch('posts.json?'+Date.now()).then(function(r){return r.json()}).then(function(arr){
     msgs=msgs.filter(function(m){return !m.pid});var top=0;
     arr.forEach(function(p){
+      if(p.ch==='_meta')return;if(p.ch==='_cmc'){CMC=p.data||{};CMCT=p.updated||'';return}
       var tc=p.ch==='TradeCoinChienLuoc',full=(p.text||'')+(p.reply?'\n(Trả lời: '+p.reply+')':''),
           ts=p.date?new Date(p.date).getTime():p.id,tm=p.date?new Date(p.date).toLocaleString('vi-VN'):'',seen={};
       if(!tc&&p.date&&ts>top){top=ts;window.LAST=tm}
@@ -164,7 +190,7 @@ function render(){
   if(!list.length){$('watch').innerHTML='';$('grid').innerHTML='<div class="empty" style="grid-column:1/-1">Không có coin nào. Bấm “Thêm tin nhắn” để dán nội dung hoặc “Tải lại dữ liệu kênh”.</div>';return}
   var card=function(c){
     var f=c.cur,top=c.msgs[0];
-    var rows=[['Phân bổ vốn',f.cap],['Lệnh gần nhất',f.buy&&(f.buy+(f.price?' @ '+f.price:''))],['Vùng mua',f.zb],['Vùng bán',f.zs],['Target',f.tgt]].filter(function(r){return r[1]});
+    var rows=[['CMC',cmcTxt(c.coin)],['Phân bổ vốn',f.cap],['Lệnh gần nhất',f.buy&&(f.buy+(f.price?' @ '+f.price:''))],['Vùng mua',f.zb],['Vùng bán',f.zs],['Target',f.tgt]].filter(function(r){return r[1]});
     return'<div class="card"><div class="top"><span class="tk">'+esc(c.coin)+'</span><span class="badge '+(c.tg&&f.st?'LONG':'NA')+'">'+(c.tg?(f.st?'Trong danh mục':'Theo dõi'):'Chú ý')+'</span><span class="sp"></span><button class="x" data-del="'+esc(c.coin)+'" aria-label="Xóa '+esc(c.coin)+'">Xóa</button></div>'
     +(rows.length?'<dl class="f">'+rows.map(function(r){return'<dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd>'}).join('')+'</dl>':'')
     +'<div class="msg" style="margin-top:10px"><time>Gần nhất · '+when(top)+link(top)+'</time>'+esc(top.text.slice(0,260))+'</div>'
@@ -174,7 +200,7 @@ function render(){
   var main=list.filter(function(c){return c.tg}),watch=list.filter(function(c){return !c.tg});
   $('grid').innerHTML=main.map(card).join('');
   $('watch').innerHTML='<p class="sub">Coin chưa có trong kênh Đỗ Bảo Crypto. Nguồn: nhóm Facebook và kênh Trade Coin Chiến Lược (chỉ bài của Đỗ Bảo).</p>'+(watch.length?'<div class="grid">'+watch.map(card).join('')+'</div>':'<div class="empty">Chưa có coin nào ở mục này.</div>');
-  $('grid').style.display=TAB==1?'':'none';$('watch').style.display=TAB==2?'':'none';$('n2').textContent=watch.length?'('+watch.length+')':'';$('t1').className=TAB==1?'on':'';$('t2').className=TAB==2?'on':'';
+  $('grid').style.display=TAB==1?'':'none';$('watch').style.display=TAB==2?'':'none';$('n2').textContent=watch.length?'('+watch.length+')':'';$('t1').className=TAB==1?'on':'';$('t2').className=TAB==2?'on':'';$('ana').style.display=TAB==3?'':'none';$('t3').className=TAB==3?'on':'';if(TAB==3)renderAna();
 }
 $('bAdd').onclick=function(){$('add').classList.toggle('open')};
 $('bSeed').onclick=loadRemote;
@@ -212,7 +238,7 @@ $('grid').onclick=function(e){
   if(c&&confirm('Xóa toàn bộ tin của '+c+'?')){msgs=msgs.filter(function(m){return m.coin!==c});save();render()}
 };
 ['q','fd','so'].forEach(function(i){$(i).oninput=render;$(i).onchange=render});
-$('t1').onclick=function(){TAB=1;render()};$('t2').onclick=function(){TAB=2;render()};
+$('t1').onclick=function(){TAB=1;render()};$('t2').onclick=function(){TAB=2;render()};$('t3').onclick=function(){TAB=3;render()};
 render();
 loadRemote();
 </script>

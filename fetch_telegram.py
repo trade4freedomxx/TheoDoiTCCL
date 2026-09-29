@@ -1,5 +1,5 @@
 """Lấy bài từ các kênh Telegram công khai (bản xem trước t.me/s/<kênh>) và gộp vào posts.json."""
-import html, json, pathlib, re, sys, time, unicodedata, urllib.request
+import datetime, html, json, os, pathlib, re, sys, time, unicodedata, urllib.request
 
 # since: chỉ giữ bài từ mốc này trở đi (2025-12-31T17:00 UTC = 00:00 ngày 1/1/2026 giờ Việt Nam)
 SOURCES = [
@@ -88,10 +88,37 @@ def fetch_source(src, store, meta):
     return seen
 
 
+def parse_cmc(data):
+    out = {}
+    for c in data:  # đã sắp theo hạng; trùng mã thì lấy hạng cao hơn
+        s = c["symbol"]
+        if s in out:
+            continue
+        q = c["quote"]["USD"]
+        out[s] = {"n": c["name"], "r": c["cmc_rank"], "p": q["price"], "mc": q["market_cap"],
+                  "fdv": q["fully_diluted_market_cap"], "v": q["volume_24h"],
+                  "c1": q["percent_change_1h"], "c24": q["percent_change_24h"],
+                  "c7": q["percent_change_7d"], "c30": q["percent_change_30d"]}
+    return out
+
+
+def fetch_cmc():
+    key = os.environ.get("CMC_API_KEY")
+    if not key:
+        print("CMC: bỏ qua (chưa có CMC_API_KEY)")
+        return None
+    req = urllib.request.Request(
+        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=500&convert=USD",
+        headers={"X-CMC_PRO_API_KEY": key, "Accept": "application/json"})
+    return parse_cmc(json.loads(urllib.request.urlopen(req, timeout=30).read())["data"])
+
+
 def main():
     old = json.loads(OUT.read_text("utf-8")) if OUT.exists() else []
     store, meta = {}, {}
     for p in old:
+        if p.get("ch") == "_cmc":
+            continue
         if p.get("ch") == "_meta":  # ghi nhớ bài mới nhất đã quét để lần sau chạy nhanh
             meta[p["src"]] = p["id"]
             continue
@@ -110,9 +137,21 @@ def main():
     since = {s["ch"]: s["since"] for s in SOURCES}
     rows = [p for k, p in sorted(store.items())
             if not (since.get(p["ch"]) and p["date"] and p["date"] < since[p["ch"]])]
+    n_posts = len(rows)
+    try:
+        cmc = fetch_cmc()
+    except Exception as e:
+        cmc = None
+        print(f"CMC: lỗi {e}")
+    if cmc:
+        rows.append({"ch": "_cmc", "id": 0, "date": None, "text": "", "reply": "", "data": cmc,
+                     "updated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")})
+        print(f"CMC: đã lấy {len(cmc)} coin")
+    else:
+        rows += [p for p in old if p.get("ch") == "_cmc"]  # giữ dữ liệu CMC lần trước
     rows += [{"ch": "_meta", "src": c, "id": i, "date": None, "text": "", "reply": ""} for c, i in meta.items()]
     OUT.write_text(json.dumps(rows, ensure_ascii=False, indent=1), "utf-8")
-    print(f"Đã lưu {len(rows) - len(meta)} bài.")
+    print(f"Đã lưu {n_posts} bài.")
 
 
 if __name__ == "__main__":
