@@ -42,6 +42,8 @@ textarea{width:100%;min-height:150px;background:var(--bg);border:1px solid var(-
 details{margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
 summary{cursor:pointer;color:var(--acc)}
 .msg{border-left:3px solid var(--line);padding:2px 0 2px 10px;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.tabs{display:flex;gap:6px;margin:0 0 12px}
+.tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .wrap h2{font-size:18px;margin:26px 0 10px}
 .msg a{color:var(--acc);margin-left:6px}
 .msg time{display:block;color:var(--mute);font-size:12px}
@@ -72,6 +74,7 @@ summary{cursor:pointer;color:var(--acc)}
       <input type="file" id="fi" accept=".json,application/json" hidden>
     </div>
   </div>
+  <div class="tabs"><button id="t1" class="on">Danh mục</button><button id="t2">Đáng chú ý <span id="n2"></span></button></div>
   <div class="grid" id="grid"></div>
   <div id="watch"></div>
 </div>
@@ -83,9 +86,9 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(msgs))}catch(e){}}
 try{var th=localStorage.getItem('tg_theme');if(th)document.documentElement.setAttribute('data-theme',th)}catch(e){}
 var $=function(i){return document.getElementById(i)};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-var COMMON='BTC ETH BNB SOL XRP ADA DOGE AVAX DOT LINK TON TRX LTC NEAR APT ARB OP SUI PEPE SHIB INJ SEI TIA WIF FET RNDR ATOM UNI AAVE FIL ETC XLM HBAR ENA ONDO ETHFI PYTH TAO'.split(' ');
+var COMMON='BTC ETH BNB SOL XRP ADA DOGE AVAX DOT LINK TON TRX LTC NEAR APT ARB OP SUI PEPE SHIB INJ SEI TIA WIF FET RNDR ATOM UNI AAVE FIL ETC XLM HBAR ENA ONDO ETHFI PYTH TAO CAKE'.split(' ');
 var CS='LINK OP DOT TON NEAR SEI FIL ETC APT UNI'.split(' ');
-var STOPW='DCA USD USDT USDC ATH ATL FOMO FUD CEO ETF DEX CEX TVL APY NFT DAO API CPI FED SEC RSI EMA MACD KOL ICO IDO TGE AMA VIP'.split(' ');
+var STOPW='TCCL CFTC USA GDP PCE FOMC ROI KYC AML IPO EUR RWA DEFI DCA USD USDT USDC ATH ATL FOMO FUD CEO ETF DEX CEX TVL APY NFT DAO API CPI FED SEC RSI EMA MACD KOL ICO IDO TGE AMA VIP'.split(' ');
 function findCoins(t,loose){
   var r=[],m,re=/(?:\$|#)([A-Za-z][A-Za-z0-9]{1,9})\b|\b([A-Z][A-Z0-9]{1,9})\s*\/\s*(?:USDT|USD|USDC)\b|\b([A-Z][A-Z0-9]{1,9})USDT\b/g;
   while((m=re.exec(t))){r.push({c:(m[1]||m[2]||m[3]).toUpperCase(),i:m.index})}
@@ -123,16 +126,17 @@ function seedAll(){
     if(!msgs.some(function(m){return m.id===id})){msgs.push({id:id,pid:s[0],tm:s[1],coin:s[2],text:s[3],ts:s[0],f:fields(s[3])});n++}});
   return n;
 }
+var TAB=1;
 function loadRemote(){
   return fetch('posts.json?'+Date.now()).then(function(r){return r.json()}).then(function(arr){
     msgs=msgs.filter(function(m){return !m.pid});var top=0;
     arr.forEach(function(p){
-      var full=(p.text||'')+(p.reply?'\n(Trả lời: '+p.reply+')':''),
+      var tc=p.ch==='TradeCoinChienLuoc',full=(p.text||'')+(p.reply?'\n(Trả lời: '+p.reply+')':''),
           ts=p.date?new Date(p.date).getTime():p.id,tm=p.date?new Date(p.date).toLocaleString('vi-VN'):'',seen={};
-      if(p.date&&ts>top){top=ts;window.LAST=tm}
-      findCoins((p.reply||'')+' '+(p.text||'')).forEach(function(c){
+      if(!tc&&p.date&&ts>top){top=ts;window.LAST=tm}
+      findCoins((p.reply||'')+' '+(p.text||''),tc).forEach(function(c){
         if(seen[c.c])return;seen[c.c]=1;
-        msgs.push({id:'p'+p.id+c.c,pid:p.id,tm:tm,coin:c.c,text:full,ts:ts,f:fields(full)});
+        msgs.push({id:(tc?'c':'p')+p.id+c.c,pid:p.id,ch:p.ch||'dobaocrypto',src:tc?'tccl':'tg',tm:tm,coin:c.c,text:full,ts:ts,f:fields(full)});
       });
     });
     save();render();
@@ -140,10 +144,10 @@ function loadRemote(){
 }
 function splitMsgs(raw){return raw.split(/\n\s*\n/).map(function(s){return s.replace(/^.+,\s*\[\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4}[^\]]*\]\s*\n/,'')})}
 function flat(t){return typeof t==='string'?t:Array.isArray(t)?t.map(function(x){return typeof x==='string'?x:(x.text||'')}).join(''):''}
-function when(m){return (m.src==='fb'?'Facebook · ':'')+m.pid?'Tin #'+m.pid+(m.tm?' · '+m.tm:''):new Date(m.ts).toLocaleString('vi-VN')}
-function link(m){return m.pid?' <a href="https://t.me/dobaocrypto/'+m.pid+'" target="_blank" rel="noopener">Mở tin gốc</a>':''}
+function when(m){var p=m.src==='fb'?'Facebook · ':m.src==='tccl'?'TCCL · Đỗ Bảo · ':'';return p+(m.pid?'Tin #'+m.pid+(m.tm?' · '+m.tm:''):new Date(m.ts).toLocaleString('vi-VN'))}
+function link(m){return m.pid?' <a href="https://t.me/'+(m.ch||'dobaocrypto')+'/'+m.pid+'" target="_blank" rel="noopener">Mở tin gốc</a>':''}
 function render(){
-  var by={},tgSet={};msgs.forEach(function(m){(by[m.coin]=by[m.coin]||[]).push(m);if(m.src!=='fb')tgSet[m.coin]=1});
+  var by={},tgSet={};msgs.forEach(function(m){(by[m.coin]=by[m.coin]||[]).push(m);if(!m.src||m.src==='tg')tgSet[m.coin]=1});
   var list=Object.keys(by).map(function(k){
     var a=by[k].slice().sort(function(x,y){return y.ts-x.ts}),cur={};
     for(var i=a.length-1;i>=0;i--){var f=a[i].f;for(var p in f)cur[p]=f[p]}
@@ -165,7 +169,8 @@ function render(){
   };
   var main=list.filter(function(c){return c.tg}),watch=list.filter(function(c){return !c.tg});
   $('grid').innerHTML=main.map(card).join('');
-  $('watch').innerHTML=watch.length?'<h2>Chú ý · '+watch.length+' coin chỉ có trong nhóm Facebook</h2><div class="grid">'+watch.map(card).join('')+'</div>':'';
+  $('watch').innerHTML='<p class="sub">Coin chưa có trong kênh Đỗ Bảo Crypto. Nguồn: nhóm Facebook và kênh Trade Coin Chiến Lược (chỉ bài của Đỗ Bảo).</p>'+(watch.length?'<div class="grid">'+watch.map(card).join('')+'</div>':'<div class="empty">Chưa có coin nào ở mục này.</div>');
+  $('grid').style.display=TAB==1?'':'none';$('watch').style.display=TAB==2?'':'none';$('n2').textContent=watch.length?'('+watch.length+')':'';$('t1').className=TAB==1?'on':'';$('t2').className=TAB==2?'on':'';
 }
 $('bAdd').onclick=function(){$('add').classList.toggle('open')};
 $('bSeed').onclick=loadRemote;
@@ -203,6 +208,7 @@ $('grid').onclick=function(e){
   if(c&&confirm('Xóa toàn bộ tin của '+c+'?')){msgs=msgs.filter(function(m){return m.coin!==c});save();render()}
 };
 ['q','fd','so'].forEach(function(i){$(i).oninput=render;$(i).onchange=render});
+$('t1').onclick=function(){TAB=1;render()};$('t2').onclick=function(){TAB=2;render()};
 render();
 loadRemote();
 </script>
