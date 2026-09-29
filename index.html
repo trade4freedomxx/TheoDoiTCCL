@@ -86,15 +86,19 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(msgs))}catch(e){}}
 try{var th=localStorage.getItem('tg_theme');if(th)document.documentElement.setAttribute('data-theme',th)}catch(e){}
 var $=function(i){return document.getElementById(i)};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-var COMMON='BTC ETH BNB SOL XRP ADA DOGE AVAX DOT LINK TON TRX LTC NEAR APT ARB OP SUI PEPE SHIB INJ SEI TIA WIF FET RNDR ATOM UNI AAVE FIL ETC XLM HBAR ENA ONDO ETHFI PYTH TAO CAKE'.split(' ');
+var COMMON=('BTC ETH BNB SOL XRP ADA DOGE AVAX DOT LINK TON TRX LTC NEAR APT ARB OP SUI PEPE SHIB INJ SEI TIA WIF FET RNDR RENDER ATOM UNI AAVE FIL ETC XLM HBAR ENA ONDO ETHFI PYTH TAO CAKE '+
+ 'HYPE PENDLE JUP RAY EIGEN STRK MANTA ALT JTO BONK FLOKI POPCAT MEW WLD AKT ARKM GRT DYM SAGA OSMO ICP ALGO VET EGLD XTZ THETA KAS XMR ZEC DASH BCH LDO RPL SSV CRV CVX SNX MKR COMP YFI SUSHI DYDX GMX MORPHO BERA MOVE PENGU VIRTUAL ZRO STG LINEA BLAST MNT IMX GALA SAND MANA AXS APE ENJ CHZ FLOW RUNE KAVA CELO ROSE QNT XDC POL MATIC ENS ARK CORE WAVE FUN SUN GAS ONE OCEAN').split(' ');
 var CS='LINK OP DOT TON NEAR SEI FIL ETC APT UNI'.split(' ');
+var STRICT='TAO OP DOT ONE SUN GAS APE SEI SUI NEAR ATOM SOL ETC FIL TON TIA ICP ENS ARK CORE WAVE FUN RAY MOVE VIRTUAL RENDER FLOW SAND MANA GALA SAGA ALT OCEAN BLAST ROSE RUNE COMP MEW POL MNT'.split(' ');
+var ALIAS={bitcoin:'BTC',ethereum:'ETH',solana:'SOL',cardano:'ADA',dogecoin:'DOGE',bittensor:'TAO',pancakeswap:'CAKE',chainlink:'LINK',uniswap:'UNI',arbitrum:'ARB',ethena:'ENA',avalanche:'AVAX',polkadot:'DOT',aptos:'APT',litecoin:'LTC',injective:'INJ',celestia:'TIA'};
 var STOPW='TCCL CFTC USA GDP PCE FOMC ROI KYC AML IPO EUR RWA DEFI DCA USD USDT USDC ATH ATL FOMO FUD CEO ETF DEX CEX TVL APY NFT DAO API CPI FED SEC RSI EMA MACD KOL ICO IDO TGE AMA VIP'.split(' ');
 function findCoins(t,loose){
-  var r=[],m,re=/(?:\$|#)([A-Za-z][A-Za-z0-9]{1,9})\b|\b([A-Z][A-Z0-9]{1,9})\s*\/\s*(?:USDT|USD|USDC)\b|\b([A-Z][A-Z0-9]{1,9})USDT\b/g;
-  while((m=re.exec(t))){r.push({c:(m[1]||m[2]||m[3]).toUpperCase(),i:m.index})}
-  var re2=/\b[A-Za-z]{2,5}\b/g;
-  while((m=re2.exec(t))){var u=m[0].toUpperCase();if(COMMON.indexOf(u)>=0&&(CS.indexOf(u)<0||m[0]!==m[0].toLowerCase()))r.push({c:u,i:m.index})}
-  if(loose){var re3=/\b[A-Z]{3,6}\b/g;while((m=re3.exec(t))){if(STOPW.indexOf(m[0])<0&&COMMON.indexOf(m[0])<0)r.push({c:m[0],i:m.index})}}
+  var r=[],m,re=/(?:\$|#)([A-Z][A-Z0-9]{1,7})\b|\b([A-Z][A-Z0-9]{1,9})\s*\/\s*(?:USDT|USD|USDC)\b|\b([A-Z][A-Z0-9]{1,9})USDT\b/g;
+  while((m=re.exec(t))){var c0=(m[1]||m[2]||m[3]).toUpperCase();if(STOPW.indexOf(c0)<0)r.push({c:c0,i:m.index})}
+  var re2=/\b[A-Za-z]{2,8}\b/g;
+  while((m=re2.exec(t))){var u=m[0].toUpperCase();if(COMMON.indexOf(u)>=0&&(STRICT.indexOf(u)<0||m[0]===u)&&(CS.indexOf(u)<0||m[0]!==m[0].toLowerCase()))r.push({c:u,i:m.index})}
+  var re4=/\b(bitcoin|ethereum|solana|cardano|dogecoin|bittensor|pancakeswap|chainlink|uniswap|arbitrum|ethena|avalanche|polkadot|aptos|litecoin|injective|celestia)\b/gi;
+  while((m=re4.exec(t))){r.push({c:ALIAS[m[1].toLowerCase()],i:m.index})}
   r.sort(function(a,b){return a.i-b.i});return r;
 }
 function fields(t){
