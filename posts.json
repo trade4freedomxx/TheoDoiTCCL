@@ -2520,9 +2520,17 @@
   "reply": ""
  },
  {
+  "ch": "dobaocrypto",
+  "id": 103,
+  "date": "2026-10-12T23:36:05+00:00",
+  "author": "",
+  "text": "Hype giảm là để buy 👌",
+  "reply": ""
+ },
+ {
   "ch": "_meta",
   "src": "dobaocrypto",
-  "id": 102,
+  "id": 103,
   "date": null,
   "text": "",
   "reply": ""
@@ -2530,7 +2538,7 @@
  {
   "ch": "_meta",
   "src": "TradeCoinChienLuoc",
-  "id": 34463,
+  "id": 34483,
   "date": null,
   "text": "",
   "reply": ""
