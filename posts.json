@@ -2528,9 +2528,17 @@
   "reply": ""
  },
  {
+  "ch": "dobaocrypto",
+  "id": 104,
+  "date": "2026-10-13T13:23:54+00:00",
+  "author": "",
+  "text": "Khó khăn là vì đích đến lớn, Không có thành quả to lớn nào trải đầy hoa hồng trên đường đi, Vậy nên, khi chúng ta kho khăn vất vả chính là lúc chúng ta đang đi lên, còn nếu 1 hành trình mà bạn thấy thoải mái thì hãy cẩn thận vì đó có thể là lúc bạn đang lao xuống dốc đấy 👌",
+  "reply": ""
+ },
+ {
   "ch": "_meta",
   "src": "dobaocrypto",
-  "id": 103,
+  "id": 104,
   "date": null,
   "text": "",
   "reply": ""
@@ -2538,7 +2546,7 @@
  {
   "ch": "_meta",
   "src": "TradeCoinChienLuoc",
-  "id": 34483,
+  "id": 34501,
   "date": null,
   "text": "",
   "reply": ""
