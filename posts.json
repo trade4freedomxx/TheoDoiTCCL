@@ -2536,9 +2536,33 @@
   "reply": ""
  },
  {
+  "ch": "dobaocrypto",
+  "id": 105,
+  "date": "2026-10-15T04:09:21+00:00",
+  "author": "",
+  "text": "ENA 🚀",
+  "reply": ""
+ },
+ {
+  "ch": "dobaocrypto",
+  "id": 106,
+  "date": "2026-10-15T04:33:34+00:00",
+  "author": "",
+  "text": "Ethfi 👍",
+  "reply": ""
+ },
+ {
+  "ch": "dobaocrypto",
+  "id": 107,
+  "date": "2026-10-15T08:23:57+00:00",
+  "author": "",
+  "text": "Pump 🎉",
+  "reply": ""
+ },
+ {
   "ch": "_meta",
   "src": "dobaocrypto",
-  "id": 104,
+  "id": 107,
   "date": null,
   "text": "",
   "reply": ""
@@ -2546,7 +2570,7 @@
  {
   "ch": "_meta",
   "src": "TradeCoinChienLuoc",
-  "id": 34519,
+  "id": 34538,
   "date": null,
   "text": "",
   "reply": ""
