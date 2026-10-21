@@ -2592,9 +2592,17 @@
   "reply": ""
  },
  {
+  "ch": "dobaocrypto",
+  "id": 112,
+  "date": "2026-10-20T15:07:21+00:00",
+  "author": "",
+  "text": "ETH 🚀",
+  "reply": ""
+ },
+ {
   "ch": "_meta",
   "src": "dobaocrypto",
-  "id": 111,
+  "id": 112,
   "date": null,
   "text": "",
   "reply": ""
@@ -2602,7 +2610,7 @@
  {
   "ch": "_meta",
   "src": "TradeCoinChienLuoc",
-  "id": 34595,
+  "id": 34613,
   "date": null,
   "text": "",
   "reply": ""
