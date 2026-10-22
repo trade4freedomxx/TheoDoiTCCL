@@ -2600,9 +2600,17 @@
   "reply": ""
  },
  {
+  "ch": "dobaocrypto",
+  "id": 113,
+  "date": "2026-10-21T13:14:41+00:00",
+  "author": "",
+  "text": "Sóng lớn thường bắt đầu trong sự im lặng 🎉",
+  "reply": ""
+ },
+ {
   "ch": "_meta",
   "src": "dobaocrypto",
-  "id": 112,
+  "id": 113,
   "date": null,
   "text": "",
   "reply": ""
@@ -2610,7 +2618,7 @@
  {
   "ch": "_meta",
   "src": "TradeCoinChienLuoc",
-  "id": 34613,
+  "id": 34634,
   "date": null,
   "text": "",
   "reply": ""
