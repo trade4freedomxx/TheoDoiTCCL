@@ -2608,9 +2608,17 @@
   "reply": ""
  },
  {
+  "ch": "dobaocrypto",
+  "id": 114,
+  "date": "2026-10-27T16:45:48+00:00",
+  "author": "",
+  "text": "Ethena Pay đã ra mắt, biến USDe từ tài sản chủ yếu phục vụ trading/DeFi thành tiền có thể giữ, chuyển và chi tiêu. Ethena Pay hiện đã live trên iOS khoảng 50 quốc gia và Ethena nói mọi số dư trong app đều tạo nhu cầu cho USDe. \n\nDefiLlama ghi nhận gross protocol revenue khoảng $65,1M Q1/2026, $51,6M Q2, và khoảng $48,9M trong Q3 tính đến thời điểm dữ liệu hiện tại.",
+  "reply": "ENA 🚀"
+ },
+ {
   "ch": "_meta",
   "src": "dobaocrypto",
-  "id": 113,
+  "id": 114,
   "date": null,
   "text": "",
   "reply": ""
@@ -2618,7 +2626,7 @@
  {
   "ch": "_meta",
   "src": "TradeCoinChienLuoc",
-  "id": 34718,
+  "id": 34739,
   "date": null,
   "text": "",
   "reply": ""
